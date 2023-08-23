@@ -67,6 +67,15 @@ contract OnChainWhitelistContract is Ownable {
         return friendTech.sharesBalance(friendTechSubject, user);
     }
 
+    function calculateAirdropAmount() internal {
+        uint256 contractBalance = IERC20(token).balanceOf(address(this));
+        roundBalance[round] = contractBalance / getSharesSupply();
+    }
+
+    function forceUpdateRound() public onlyOwner {
+        round += 1;
+    }
+
     /**
      * @notice Add to whitelist
      */
@@ -113,13 +122,8 @@ contract OnChainWhitelistContract is Ownable {
             }
         }
     }
-
-    function calculateAirdropAmount() internal {
-        uint256 contractBalance = IERC20(token).balanceOf(address(this));
-        roundBalance[round] = contractBalance / getSharesSupply();
-    }
  
-    function airdropTowhitelist(address[] calldata toAddresses) external
+    function airdropTowhitelist(address[] calldata toAddresses) external onlyOwner
     {
         for (uint i = 0; i < toAddresses.length; i++) {
             if(whitelist[round][toAddresses[i]]) {
