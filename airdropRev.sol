@@ -46,7 +46,7 @@ contract OnChainWhitelistContract is Ownable {
         friendTechSubject = _friendTechSubject;
         token = 0x5104d35A6dE00b19cd5BD0649e3c31c7469fbF1A;
     }
-
+        //@FinderSquid on X
     function updateRewardsToken(address _token) public onlyOwner {
         token = _token;
     }
@@ -58,7 +58,6 @@ contract OnChainWhitelistContract is Ownable {
     function getSharesSupply() public view returns (uint256) {
         return friendTech.sharesSupply(friendTechSubject);
     }
-    //0x5B34F85e7d8DBE918c90081d2b799B4480B87E3B, 0x25dbF89A11a44BDa6E500a22e5E5D52d3b41eD42
 
     function getShareCount(address user) public view returns (uint256) {
         return friendTech.sharesBalance(friendTechSubject, user);
@@ -70,7 +69,7 @@ contract OnChainWhitelistContract is Ownable {
     function addToWhitelist(address[] calldata toAddAddresses) 
     external onlyOwner
     {
-        //require(IERC20(token).balanceOf(address(this)) > 0);
+        require(IERC20(token).balanceOf(address(this)) > 0, "Balance of this address is 0.");
         
         if(roundBalance[round] == 0) {
             calculateAirdropAmount();
@@ -93,6 +92,8 @@ contract OnChainWhitelistContract is Ownable {
         }
     }
 
+    //@FinderSquid on X
+
     /**
      * @notice Remove from whitelist
      */
@@ -101,9 +102,11 @@ contract OnChainWhitelistContract is Ownable {
     {
         for (uint i = 0; i < toRemoveAddresses.length; i++) {
             uint256 userBalance = getShareCount(toRemoveAddresses[i]);
-            delete whitelist[round][toRemoveAddresses[i]];
-            holderBalance[round][toRemoveAddresses[i]] = userBalance;
-            holderCount[round] -= 1;
+            if(whitelist[round][toRemoveAddresses[i]] == true) {
+                delete whitelist[round][toRemoveAddresses[i]];
+                holderBalance[round][toRemoveAddresses[i]] = userBalance;
+                holderCount[round] -= 1;
+            }
         }
     }
 
@@ -119,12 +122,13 @@ contract OnChainWhitelistContract is Ownable {
                 if(!airdropToUserStatus[round][toAddresses[i]]){
                     airdropToUserStatus[round][toAddresses[i]] = true;
                     dropCount[round] += 1;
-                    IERC20(token).transfer(toAddresses[i], roundBalance[round]);
+                    uint256 amount = airdropValue[round][toAddresses[i]];
+                    IERC20(token).transfer(toAddresses[i], amount);
                 }
             }
-            if(holderCount[round] <= dropCount[round]) {
-                round += 1;
-            } 
         }
+        if(holderCount[round] <= dropCount[round]) {
+                round += 1;
+        } 
     }
 }
