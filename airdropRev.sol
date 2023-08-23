@@ -29,15 +29,15 @@ contract OnChainWhitelistContract is Ownable {
         //All mappings are called by [round] as the first parameter.   [round][address] => whitelist
     mapping(uint256 => mapping(address => bool)) public whitelist;
         //holders balance at the time of the last snapshot. [round][address] => holderBalance 
-    mapping(uint256 => mapping(address => uint256)) public holderBalance;
+    mapping(uint256 => mapping(address => uint256)) internal holderBalance;
         //decided amount per share at the time of snapshot [round] => roundBalance 
-    mapping(uint256 => uint256) public roundBalance;
+    mapping(uint256 => uint256) internal roundBalance;
         //calculates airdrop amount for round depending on holderBalance [round][address] => airdropValue;
     mapping(uint256 => mapping(address => uint256)) public airdropValue;
         //holders count of shares at the time of snapshot [round] => holderCount
-    mapping(uint256 => uint256) public holderCount;
+    mapping(uint256 => uint256) internal holderCount;
         //tracks the number of completed airdrops [round] => dropCount
-    mapping(uint256 => uint256) public dropCount;
+    mapping(uint256 => uint256) internal dropCount;
         //tracks if airdrop has been completed in a round to a specific address
     mapping(uint256 => mapping(address => bool)) public airdropToUserStatus;
 
@@ -49,6 +49,10 @@ contract OnChainWhitelistContract is Ownable {
         //@FinderSquid on X
     function updateRewardsToken(address _token) public onlyOwner {
         token = _token;
+    }
+
+    function updateSubject(address _friendTechSubject) public onlyOwner {
+        friendTechSubject = _friendTechSubject;
     }
 
     function rewardsTokenBalance() public view returns(uint256) {
